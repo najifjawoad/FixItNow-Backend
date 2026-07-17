@@ -123,7 +123,39 @@ const logInUser = async (payload: ILogInUser) => {
   };
 };
 
+// get my profile controller :
+const getMyProfile = async (userId: string, role: string) => {
+
+
+  if (role === "TECHNICIAN") {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: userId,
+      },
+      omit: {
+        password: true,
+      },
+      include: {
+        technicianProfile: true,
+      },
+    });
+    return user;
+  }
+
+    const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+    omit: {
+      password: true,
+    },
+  });
+
+  return user;
+};
+
 export const authService = {
   registerUserIntoDb,
   logInUser,
+  getMyProfile,
 };

@@ -6,6 +6,7 @@ const router = Router();
 
 router.post("/register", authController.registerUser);
 router.post("/login", authController.logInUser);
+router.get("/me",authController.getMyProfile)
 
 
 
