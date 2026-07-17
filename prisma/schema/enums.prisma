@@ -1,0 +1,35 @@
+
+enum Role {
+  CUSTOMER
+  TECHNICIAN
+  ADMIN
+}
+enum Status{
+    ACTIVE
+    BANNED
+
+}
+enum BookingStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  PAID
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
