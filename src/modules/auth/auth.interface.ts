@@ -11,3 +11,8 @@ export interface RegisterUserPayload {
     experienceYears ?: number;
     skills ?: string[];
 }
+
+export interface ILogInUser {
+    email : string;
+    password : string;
+}
