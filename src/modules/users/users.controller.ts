@@ -23,7 +23,23 @@ const updateMyProfile = catchAsync(async(req : Request , res: Response , next: N
 
 })
 
+// get technicians profiles:
+
+const getTechnicianProfiles = catchAsync(async(req : Request , res: Response , next: NextFunction)=>{
+
+    const result = await userService.getTechnicianProfiles();
+
+        sendResponse(res , {
+        success : true,
+        statusCode : httpStatus.OK,
+        message : "Technicians profile fetched successfully",
+        data : result
+    })
+
+})
+
 
 export const userController = {
-    updateMyProfile
+    updateMyProfile,
+    getTechnicianProfiles
 }

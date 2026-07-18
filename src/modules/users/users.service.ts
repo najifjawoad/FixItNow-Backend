@@ -1,8 +1,5 @@
 import { prisma } from "../../lib/prisma";
 
-
-
-
 // Update my Profile :
 const updateMyProfile = async (userId: string, payload: any) => {
   const { name, email, phone, role, bio, experienceYears, skills } = payload;
@@ -29,7 +26,7 @@ const updateMyProfile = async (userId: string, payload: any) => {
         technicianProfile: true,
       },
     });
-   return updatedUser;
+    return updatedUser;
   }
   const updateUser = await prisma.user.update({
     where: { id: userId },
@@ -46,6 +43,27 @@ const updateMyProfile = async (userId: string, payload: any) => {
   return updateUser;
 };
 
+// get technician profiles :
+
+const getTechnicianProfiles = async () => {
+  const technicianProfiles = await prisma.technicianProfile.findMany({
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          status: true,
+        },
+      },
+    },
+  });
+
+  return technicianProfiles;
+};
+
 export const userService = {
   updateMyProfile,
+  getTechnicianProfiles,
 };
