@@ -1,6 +1,8 @@
 import { prisma } from "../../lib/prisma";
-import { CreateServicePayload } from "./technician.interface";
+import { AddAvailabilityPayload, CreateServicePayload } from "./technician.interface";
 
+
+// create services : 
 const createServices = async (
   userId: string,
   payload: CreateServicePayload,
@@ -39,6 +41,46 @@ const createServices = async (
   return service;
 };
 
+// create availability :
+const createAvailability  = async(userId : string , payload : AddAvailabilityPayload)=>{
+
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new Error( "Technician profile not found");
+  }
+   if (payload.startTime >= payload.endTime) {
+    throw new Error( "startTime must be before endTime");
+  }
+   const overlap = await prisma.availability.findFirst({
+    where: {
+      technicianId: technicianProfile.id,
+      dayOfWeek: payload.dayOfWeek,
+      startTime: { lt: payload.endTime },
+      endTime: { gt: payload.startTime },
+    },
+  });
+
+  if (overlap) {
+    throw new Error( "This slot overlaps with an existing availability slot");
+  }
+  const availability = prisma.availability.create({
+    data: {
+      technicianId: technicianProfile.id,
+      dayOfWeek: payload.dayOfWeek,
+      startTime: payload.startTime,
+      endTime: payload.endTime,
+    },
+  });
+
+  return availability;
+
+
+
+}
 export const technicianServices = {
   createServices,
+  createAvailability
 };

@@ -4,25 +4,47 @@ import { technicianServices } from "./technician.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
-
-const createServices = catchAsync(async(req: Request, res: Response, next : NextFunction)=>{
-
-
+// create services :
+const createServices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     const payload = req.body;
 
-
-    const result = await technicianServices.createServices(userId  as string,payload );
+    const result = await technicianServices.createServices(
+      userId as string,
+      payload,
+    );
 
     sendResponse(res, {
       success: true,
-      statusCode : httpStatus.OK,
+      statusCode: httpStatus.OK,
       message: "Service created successfully",
       data: result,
-    })
+    });
+  },
+);
 
-})
+// create  availability :
+const createAvailability = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const payload = req.body;
 
-export const technicianController= {
-    createServices
-}
+    const result = await technicianServices.createAvailability(
+      userId as string,
+      payload,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Availability added successfully",
+      data: result,
+    });
+  },
+);
+
+export const technicianController = {
+  createServices,
+  createAvailability,
+};
