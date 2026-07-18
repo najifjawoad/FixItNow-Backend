@@ -8,7 +8,10 @@ const router = Router();
 
 router.get("/allUsers" ,auth(Role.ADMIN ,Role.CUSTOMER, Role.TECHNICIAN) , adminController.getAllUsers)
 
-router.patch("/updateUserStatus/:id",auth(Role.ADMIN) ,adminController.updateUserStatus)
+router.patch("/updateUserStatus/:id",auth(Role.ADMIN) ,adminController.updateUserStatus);
+
+
+router.post("/categories" , auth(Role.ADMIN), adminController.createCategories)
 
 
 export const adminRoutes = router;

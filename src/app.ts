@@ -9,6 +9,7 @@ import { prisma } from "./lib/prisma";
 import { authRoutes } from "./modules/auth/auth.route";
 import { userRoutes } from "./modules/users/users.route";
 import { adminRoutes } from "./modules/admin/admin.route";
+import { technicianRoutes } from "./modules/technician/technician.route";
 
 const app: Application = express();
 
@@ -32,6 +33,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.use("/api/auth" ,authRoutes );
 app.use("/api/users" , userRoutes);
 app.use("/api/admin" , adminRoutes);
+app.use("/api/technician" , technicianRoutes);
 
 
 export default app;

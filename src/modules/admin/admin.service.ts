@@ -1,5 +1,6 @@
 import { Status } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+import { ICrerateCategory } from "./admin.interface";
 
 // get all users :
 const getAllUsers = async () => {
@@ -36,7 +37,30 @@ const updateUserStatus = async (userId: string, status: Status) => {
   return updatedUser;
 };
 
+
+
+// create categories :
+const createCategories = async(payload : ICrerateCategory)=>{
+
+  const {name , description} = payload;
+
+  const existing = await prisma.category.findUnique({
+    where : {name}
+  })
+  if(existing)
+  {
+    throw new Error("Category already exists")
+  }
+
+  const category = await prisma.category.create({
+    data:{name , description}
+  })
+
+  return category;
+}
+
 export const adminService = {
   getAllUsers,
   updateUserStatus,
+  createCategories
 };
