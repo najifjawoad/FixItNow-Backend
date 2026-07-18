@@ -15,7 +15,7 @@ const registerUserIntoDb = async (payload: RegisterUserPayload) => {
     throw new Error("Please provide all required fields.");
   }
 
-  if (!["CUSTOMER", "TECHNICIAN"].includes(role)) {
+  if (!["CUSTOMER", "TECHNICIAN" ,"ADMIN"].includes(role)) {
     throw new Error("Invalid role.");
   }
 
