@@ -11,7 +11,9 @@ router.get("/allUsers" ,auth(Role.ADMIN ,Role.CUSTOMER, Role.TECHNICIAN) , admin
 router.patch("/updateUserStatus/:id",auth(Role.ADMIN) ,adminController.updateUserStatus);
 
 
-router.post("/categories" , auth(Role.ADMIN), adminController.createCategories)
+router.post("/categories" , auth(Role.ADMIN), adminController.createCategories);
+
+
 
 
 export const adminRoutes = router;
