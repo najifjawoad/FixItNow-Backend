@@ -93,6 +93,10 @@ const logInUser = async (payload: ILogInUser) => {
     where: { email },
   });
 
+  if (user.status === "BANNED") {
+    throw new Error("your account has been banned . please contact support");
+  }
+
   const isPasswordMatched = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatched) {
@@ -125,8 +129,6 @@ const logInUser = async (payload: ILogInUser) => {
 
 // get my profile controller :
 const getMyProfile = async (userId: string, role: string) => {
-
-
   if (role === "TECHNICIAN") {
     const user = await prisma.user.findUniqueOrThrow({
       where: {
@@ -142,7 +144,7 @@ const getMyProfile = async (userId: string, role: string) => {
     return user;
   }
 
-    const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,
     },

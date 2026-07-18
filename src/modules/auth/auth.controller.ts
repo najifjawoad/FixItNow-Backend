@@ -55,17 +55,11 @@ const logInUser = catchAsync(
 // Get my profile controller
 const getMyProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { accessToken } = req.cookies;
-    console.log(accessToken);
-
-    const verifiedToken = jwtUtils.verifyToken(
-      accessToken,
-      config.jwt_access_secret,
-    );
-
+    
+   
     const profile = await authService.getMyProfile(
-      verifiedToken.id,
-      verifiedToken.role,
+      req.user?.id as string,
+      req.user?.role as string,
     );
 
     sendResponse(res, {

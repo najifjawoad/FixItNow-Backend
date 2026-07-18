@@ -14,7 +14,10 @@ const createToken = (
 const verifyToken = (token :string , secret : string) =>{
     try {
         const verifiedToken = jwt.verify(token, secret)
-        return verifiedToken as JwtPayload
+        return {
+          success : true,
+          data :  verifiedToken as JwtPayload
+        }
         
     } catch (error : any) {
        return {
