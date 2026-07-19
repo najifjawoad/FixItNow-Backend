@@ -13,6 +13,9 @@ router.patch("/updateUserStatus/:id",auth(Role.ADMIN) ,adminController.updateUse
 
 router.post("/categories" , auth(Role.ADMIN), adminController.createCategories);
 
+router.get("/allCategories" , auth(Role.ADMIN)  , adminController.getAllCategories)
+
+router.get("/allBookings" , auth(Role.ADMIN)  ,adminController.getAllBookings )
 
 
 

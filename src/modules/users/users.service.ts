@@ -45,7 +45,6 @@ const updateMyProfile = async (userId: string, payload: any) => {
 };
 
 // get technician profiles :
-
 const getTechnicianProfiles = async () => {
   const technicianProfiles = await prisma.technicianProfile.findMany({
     include: {
@@ -65,10 +64,7 @@ const getTechnicianProfiles = async () => {
 };
 
 // get my bookings :
-const getMyBookings = async (
-  userId: string,
-  role: Role,
-) => {
+const getMyBookings = async (userId: string, role: Role) => {
   if (role === "CUSTOMER") {
     const customersBookings = await prisma.booking.findMany({
       where: { customerId: userId },
@@ -101,30 +97,36 @@ const getMyBookings = async (
     }
 
     const techniciansBookings = await prisma.booking.findMany({
-      where : {technicianId : technicianProfile.id},
-      include : {service :true ,
-        customer : {
-          select :{
-            id : true,
-            name : true,
-            phone : true
-          }
-        }
-
-      } ,
-      orderBy : {scheduledAt :"desc"}
-    })
+      where: { technicianId: technicianProfile.id },
+      include: {
+        service: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+      },
+      orderBy: { scheduledAt: "desc" },
+    });
     return techniciansBookings;
   }
-  
+
   throw new Error("Invalid role for this action");
+};
 
-
+// get booking details :
+const getBookingDetails = async (bookingId: string) => {
+  const bookingDetails = await prisma.booking.findUniqueOrThrow({
+    where: { id: bookingId },
+  });
+  return bookingDetails;
 };
 
 export const userService = {
   updateMyProfile,
   getTechnicianProfiles,
- getMyBookings 
-
+  getMyBookings,
+  getBookingDetails,
 };

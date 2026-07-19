@@ -12,4 +12,6 @@ router.get("/technicians" , auth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN), us
 
 router.get("/get-my-bookings" , auth(Role.CUSTOMER, Role.TECHNICIAN), userController.getMyBookings )
 
+router.get("/get-booking-details/:id" , auth(Role.CUSTOMER, Role.TECHNICIAN) , userController.getBookingDetails)
+
 export const userRoutes = router;
