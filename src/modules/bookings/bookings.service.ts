@@ -1,55 +1,73 @@
 import { prisma } from "../../lib/prisma";
 import { CreateBookingPayload } from "./bookings.interface";
 
-const createBookings = async (
-  customerId: string,
-  payload: CreateBookingPayload,
-) => {
+const createBooking = async (customerId: string, payload: CreateBookingPayload) => {
+  if (!payload.serviceId || !payload.availabilityId || !payload.address) {
+    throw new Error("serviceId, availabilityId and address are required");
+  }
+
   const service = await prisma.service.findUnique({
-    where: {
-      id: payload.serviceId,
-    },
-    include: { technician: true },
+    where: { id: payload.serviceId },
   });
+
   if (!service) {
     throw new Error("Service not found");
   }
 
-  const scheduledAt = new Date(payload.scheduledAt);
-  if (scheduledAt <= new Date()) {
-    throw new Error("scheduledAt must be in the future");
-  }
+  const booking = await prisma.$transaction(async (tx) => {
+    const slot = await tx.availability.findUnique({
+      where: { id: payload.availabilityId },
+    });
 
-  const conflict = await prisma.booking.findFirst({
-    where: {
-      technicianId: service.technicianId,
-      scheduledAt,
-      status: { in: ["REQUESTED", "ACCEPTED", "PAID", "IN_PROGRESS"] },
-    },
+    if (!slot) {
+      throw new Error("Availability slot not found");
+    }
+
+    if (slot.technicianId !== service.technicianId) {
+      throw new Error("This availability slot does not belong to the selected service's technician");
+    }
+
+    if (slot.isBooked) {
+      throw new Error("This slot is already booked");
+    }
+
+    // Derive scheduledAt from the slot's date + startTime instead of trusting client input
+    const datePart = slot.date.toISOString().split("T")[0];
+    const scheduledAt = new Date(`${datePart}T${slot.startTime}:00.000Z`);
+
+    if (isNaN(scheduledAt.getTime())) {
+      throw new Error("Could not derive a valid scheduled time from this slot");
+    }
+
+    const newBooking = await tx.booking.create({
+      data: {
+        customerId,
+        technicianId: service.technicianId,
+        serviceId: service.id,
+        availabilityId: slot.id,
+        scheduledAt,
+        address: payload.address,
+        notes: payload.notes,
+        status: "REQUESTED",
+      },
+      include: {
+        service: true,
+        technician: { include: { user: true } },
+      },
+    });
+
+    // Lock the slot immediately so no other customer can request it
+    await tx.availability.update({
+      where: { id: slot.id },
+      data: { isBooked: true },
+    });
+
+    return newBooking;
   });
-   if (conflict) {
-    throw new Error("Technician is already booked at this time");
-  }
-    const booking = await prisma.booking.create({
-    data: {
-      customerId,
-      technicianId: service.technicianId,
-      serviceId: service.id,
-      scheduledAt,
-      address: payload.address,
-      notes: payload.notes,
-      status: "REQUESTED",
-    },
-    include: {
-      service: true,
-      technician: { include: { user: true } },
-    },
-  });
- return booking;
 
-
+  return booking;
 };
 
-export const bookingsService = {
-  createBookings,
+export const bookingServices = {
+  createBooking,
 };

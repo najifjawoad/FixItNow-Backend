@@ -1,15 +1,15 @@
 model Availability {
-  id           String    @id @default(uuid())
+  id           String   @id @default(uuid())
   technicianId String
-  dayOfWeek    DayOfWeek
-  startTime    DateTime 
-  endTime      DateTime
-  isBooked     Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  
-//   Relations :
-  technician TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
+  date         DateTime @db.Date 
+  startTime    String 
+  endTime      String
+  isBooked     Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  @@index([technicianId])
+  technician TechnicianProfile @relation(fields: [technicianId], references: [id], onDelete: Cascade)
+  booking    Booking?        
+  @@unique([technicianId, date, startTime])
+  @@index([technicianId, date])
   @@map("availability")
 }

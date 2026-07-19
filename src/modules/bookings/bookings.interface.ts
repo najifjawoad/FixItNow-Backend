@@ -1,6 +1,6 @@
-export interface CreateBookingPayload  {
-  serviceId: string;
-  scheduledAt: string; 
-  address: string;
-  notes?: string;
-};
+export type CreateBookingPayload = {
+     serviceId: string;
+     availabilityId: string;
+     address: string;
+     notes?: string;
+   };

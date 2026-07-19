@@ -9,7 +9,7 @@ export interface CreateServicePayload {
 };
 
 export interface AddAvailabilityPayload {
-  dayOfWeek: DayOfWeek
+  date: string;
   startTime: string; 
   endTime: string;   
 };

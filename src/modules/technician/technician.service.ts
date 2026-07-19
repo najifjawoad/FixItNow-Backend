@@ -1,8 +1,8 @@
 import { prisma } from "../../lib/prisma";
+
 import { AddAvailabilityPayload, CreateServicePayload } from "./technician.interface";
 
-
-// create services : 
+// create services :
 const createServices = async (
   userId: string,
   payload: CreateServicePayload,
@@ -42,51 +42,64 @@ const createServices = async (
 };
 
 // create availability :
-const createAvailability  = async(userId : string , payload : AddAvailabilityPayload)=>{
-
+const createAvailability = async (userId: string, payload: AddAvailabilityPayload) => {
   const technicianProfile = await prisma.technicianProfile.findUnique({
     where: { userId },
   });
 
   if (!technicianProfile) {
-    throw new Error( "Technician profile not found");
+    throw new Error("Technician profile not found");
   }
-   if (payload.startTime >= payload.endTime) {
-    throw new Error( "startTime must be before endTime");
+
+  if (payload.startTime >= payload.endTime) {
+    throw new Error("startTime must be before endTime");
   }
-   const overlap = await prisma.availability.findFirst({
+
+  const slotDate = new Date(payload.date);
+
+  if (isNaN(slotDate.getTime())) {
+    throw new Error("Invalid date");
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (slotDate < today) {
+    throw new Error("Cannot add availability for a past date");
+  }
+
+  const overlap = await prisma.availability.findFirst({
     where: {
       technicianId: technicianProfile.id,
-      dayOfWeek: payload.dayOfWeek,
+      date: slotDate,
       startTime: { lt: payload.endTime },
       endTime: { gt: payload.startTime },
     },
   });
 
   if (overlap) {
-    throw new Error( "This slot overlaps with an existing availability slot");
+    throw new Error("This slot overlaps with an existing availability slot");
   }
-  const availability = prisma.availability.create({
+
+  const availability = await prisma.availability.create({
     data: {
       technicianId: technicianProfile.id,
-      dayOfWeek: payload.dayOfWeek,
+      date: slotDate,
       startTime: payload.startTime,
       endTime: payload.endTime,
     },
   });
 
   return availability;
-
-
-
-}
+};
 
 // get all categories :
 const getAllCategories = async () => {
   return await prisma.category.findMany();
 };
+
 export const technicianServices = {
   createServices,
   createAvailability,
-  getAllCategories
+  getAllCategories,
 };

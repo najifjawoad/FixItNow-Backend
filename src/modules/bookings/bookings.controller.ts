@@ -2,13 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
-import { bookingsService } from "./bookings.service";
+import { bookingServices } from "./bookings.service";
+
 
 const createBooking = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const customerId = req.user?.id;
     const payload = req.body;
-    const result = await bookingsService.createBookings(
+    const result = await bookingServices.createBooking(
       customerId as string,
       payload,
     );
