@@ -21,3 +21,9 @@ export type GetTechniciansFilters = {
   page?: string;
   limit?: string;
 };
+
+export type CreateReviewPayload = {
+  bookingId: string;
+  rating: number;
+  comment?: string;
+};

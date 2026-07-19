@@ -18,4 +18,7 @@ router.get("/services",auth(Role.ADMIN,Role.CUSTOMER) ,userController.getAllServ
 
 router.get("/technicians/:id", auth(Role.ADMIN,Role.CUSTOMER)  ,userController.getTechnicianById);
 
+
+router.post("/review", auth(Role.CUSTOMER), userController.createReview);
+
 export const userRoutes = router;

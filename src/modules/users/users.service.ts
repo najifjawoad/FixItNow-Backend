@@ -4,7 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus  from "http-status";
-import { GetServicesFilters, GetTechniciansFilters } from "./users.interface";
+import { CreateReviewPayload, GetServicesFilters, GetTechniciansFilters } from "./users.interface";
 // Update my Profile :
 const updateMyProfile = async (userId: string, payload: any) => {
   const { name, email, phone, role, bio, experienceYears, skills } = payload;
@@ -286,6 +286,71 @@ const getTechnicianById = async (id: string) => {
 };
 
 
+// create review :
+const createReview = async (customerId: string, payload: CreateReviewPayload) => {
+  const { bookingId, rating, comment } = payload;
+
+  if (!bookingId || rating === undefined) {
+    throw new Error("bookingId and rating are required");
+  }
+
+  if (rating < 1 || rating > 5) {
+    throw new Error("rating must be between 1 and 5");
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+  });
+
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  if (booking.customerId !== customerId) {
+    throw new Error("This booking does not belong to you");
+  }
+
+  if (booking.status !== "COMPLETED") {
+    throw new Error("You can only review a booking after it is completed");
+  }
+
+  const existingReview = await prisma.review.findUnique({
+    where: { bookingId },
+  });
+
+  if (existingReview) {
+    throw new Error("You have already reviewed this booking");
+  }
+
+  const review = await prisma.$transaction(async (tx) => {
+    const newReview = await tx.review.create({
+      data: {
+        bookingId,
+        customerId,
+        technicianId: booking.technicianId,
+        rating,
+        comment,
+      },
+    });
+
+    // Recalculate technician's average rating from all their reviews
+    const agg = await tx.review.aggregate({
+      where: { technicianId: booking.technicianId },
+      _avg: { rating: true },
+    });
+
+    await tx.technicianProfile.update({
+      where: { id: booking.technicianId },
+      data: { avgRating: agg._avg.rating ?? 0 },
+    });
+
+    return newReview;
+  });
+
+  return review;
+};
+
+
 
 
 
@@ -295,5 +360,6 @@ export const userService = {
   getMyBookings,
   getBookingDetails,
   getAllServices,
-  getTechnicianById
+  getTechnicianById,
+  createReview
 };

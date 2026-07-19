@@ -73,30 +73,45 @@ const getBookingDetails = catchAsync(
 );
 
 // get all services with filter :
-const getAllServices = catchAsync(async (req: Request, res: Response , next: NextFunction) => {
-  const result = await userService.getAllServices(req.query);
+const getAllServices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await userService.getAllServices(req.query);
 
-sendResponse(res ,  {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Services retrieved successfully",
-    meta: result.meta,
-    data: result.data,
-  });
-});
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Services retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  },
+);
 
 // get technician profiles with review :
 const getTechnicianById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await userService.getTechnicianById(id as string);
 
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
     success: true,
+    statusCode: httpStatus.OK,
     message: "Technician profile retrieved successfully",
     data: result,
   });
 });
 
+// CREATE REVIEW :
+const createReview = catchAsync(async (req: Request, res: Response) => {
+  const customerId = req.user?.id;
+  const result = await userService.createReview(customerId as string, req.body);
+
+    sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Review submitted successfully",
+    data: result,
+  });
+});
 
 export const userController = {
   updateMyProfile,
@@ -104,5 +119,6 @@ export const userController = {
   getMyBookings,
   getBookingDetails,
   getAllServices,
-  getTechnicianById
+  getTechnicianById,
+  createReview
 };
