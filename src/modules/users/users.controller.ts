@@ -3,7 +3,6 @@ import { catchAsync } from "../../utils/catchAsync";
 import { userService } from "./users.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
-import { bookingsService } from "../bookings/bookings.service";
 import { Role } from "../../../generated/prisma/enums";
 
 // Update my Profile :
@@ -75,9 +74,24 @@ const getBookingDetails = catchAsync(
   },
 );
 
+// get all services with filter :
+const getAllServices = catchAsync(async (req: Request, res: Response , next: NextFunction) => {
+  const result = await userService.getAllServices(req.query);
+
+sendResponse(res ,  {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Services retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+
 export const userController = {
   updateMyProfile,
   getTechnicianProfiles,
   getMyBookings,
   getBookingDetails,
+  getAllServices
 };

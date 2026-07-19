@@ -14,4 +14,8 @@ router.get("/get-my-bookings" , auth(Role.CUSTOMER, Role.TECHNICIAN), userContro
 
 router.get("/get-booking-details/:id" , auth(Role.CUSTOMER, Role.TECHNICIAN) , userController.getBookingDetails)
 
+router.get("/services", userController.getAllServices);
+
+
+
 export const userRoutes = router;

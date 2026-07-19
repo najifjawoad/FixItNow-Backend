@@ -1,6 +1,10 @@
+import { NextFunction, Request, Response } from "express";
 import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
+import httpStatus  from "http-status";
+import { GetServicesFilters } from "./users.interface";
 // Update my Profile :
 const updateMyProfile = async (userId: string, payload: any) => {
   const { name, email, phone, role, bio, experienceYears, skills } = payload;
@@ -124,9 +128,86 @@ const getBookingDetails = async (bookingId: string) => {
   return bookingDetails;
 };
 
+// get all services with filter :
+const getAllServices = async (filters: GetServicesFilters) => {
+  const {
+    categoryId,
+    search,
+    minPrice,
+    maxPrice,
+    minRating,
+    sortBy = "newest",
+    sortOrder = "desc",
+    page = "1",
+    limit = "10",
+  } = filters;
+
+  const pageNum = Math.max(Number(page) || 1, 1);
+  const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50); 
+  const skip = (pageNum - 1) * limitNum;
+
+  const where: any = {};
+
+  if (categoryId) {
+    where.categoryId = categoryId;
+  }
+
+  if (search) {
+    where.title = { contains: search, mode: "insensitive" };
+  }
+
+  if (minPrice || maxPrice) {
+    where.price = {};
+    if (minPrice) where.price.gte = Number(minPrice);
+    if (maxPrice) where.price.lte = Number(maxPrice);
+  }
+
+  if (minRating) {
+    where.technician = {
+      avgRating: { gte: Number(minRating) },
+    };
+  }
+
+  const orderBy: any =
+    sortBy === "price"
+      ? { price: sortOrder }
+      : sortBy === "rating"
+      ? { technician: { avgRating: sortOrder } }
+      : { createdAt: sortOrder };
+
+  const [services, total] = await prisma.$transaction([
+    prisma.service.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limitNum,
+      include: {
+        category: true,
+        technician: {
+          include: {
+            user: { select: { id: true, name: true } },
+          },
+        },
+      },
+    }),
+    prisma.service.count({ where }),
+  ]);
+
+  return {
+    meta: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+    data: services,
+  };
+};
+
 export const userService = {
   updateMyProfile,
   getTechnicianProfiles,
   getMyBookings,
   getBookingDetails,
+  getAllServices
 };
