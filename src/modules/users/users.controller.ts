@@ -85,11 +85,24 @@ sendResponse(res ,  {
   });
 });
 
+// get technician profiles with review :
+const getTechnicianById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await userService.getTechnicianById(id as string);
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: "Technician profile retrieved successfully",
+    data: result,
+  });
+});
+
 
 export const userController = {
   updateMyProfile,
   getAllTechnicians,
   getMyBookings,
   getBookingDetails,
-  getAllServices
+  getAllServices,
+  getTechnicianById
 };

@@ -49,7 +49,6 @@ const updateMyProfile = async (userId: string, payload: any) => {
 };
 
 // get technician profiles with filter :
-
 const getAllTechnicians = async (filters: GetTechniciansFilters) => {
   const {
     search,
@@ -105,6 +104,7 @@ const getAllTechnicians = async (filters: GetTechniciansFilters) => {
       include: {
         user: { select: { id: true, name: true, phone: true } },
         services: { include: { category: true } },
+        reviews : true,
       },
     }),
     prisma.technicianProfile.count({ where }),
@@ -120,6 +120,7 @@ const getAllTechnicians = async (filters: GetTechniciansFilters) => {
     data: technicians,
   };
 };
+
 // get my bookings :
 const getMyBookings = async (userId: string, role: Role) => {
   if (role === "CUSTOMER") {
@@ -257,10 +258,42 @@ const getAllServices = async (filters: GetServicesFilters) => {
   };
 };
 
+// get technician profiles with review :
+const getTechnicianById = async (id: string) => {
+  const technician = await prisma.technicianProfile.findUnique({
+    where: { id },
+    include: {
+      user: { select: { id: true, name: true, phone: true } },
+      services: { include: { category: true } },
+      availability: {
+        where: { isBooked: false }, // only show open slots publicly
+        orderBy: { date: "asc" },
+      },
+      reviews: {
+        orderBy: { createdAt: "desc" },
+        include: {
+          customer: { select: { id: true, name: true } },
+        },
+      },
+    },
+  });
+
+  if (!technician) {
+    throw new Error("Technician not found");
+  }
+
+  return technician;
+};
+
+
+
+
+
 export const userService = {
   updateMyProfile,
   getAllTechnicians,
   getMyBookings,
   getBookingDetails,
-  getAllServices
+  getAllServices,
+  getTechnicianById
 };
