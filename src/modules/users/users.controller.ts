@@ -23,18 +23,16 @@ const updateMyProfile = catchAsync(
 );
 
 // get technicians profiles:
-const getTechnicianProfiles = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const result = await userService.getTechnicianProfiles();
+const getAllTechnicians = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.getAllTechnicians(req.query);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Technicians profile fetched successfully",
-      data: result,
-    });
-  },
-);
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: "Technicians retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 // get my bookings :
 
@@ -90,7 +88,7 @@ sendResponse(res ,  {
 
 export const userController = {
   updateMyProfile,
-  getTechnicianProfiles,
+  getAllTechnicians,
   getMyBookings,
   getBookingDetails,
   getAllServices

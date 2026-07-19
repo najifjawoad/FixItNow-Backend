@@ -4,7 +4,7 @@ import { prisma } from "../../lib/prisma";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus  from "http-status";
-import { GetServicesFilters } from "./users.interface";
+import { GetServicesFilters, GetTechniciansFilters } from "./users.interface";
 // Update my Profile :
 const updateMyProfile = async (userId: string, payload: any) => {
   const { name, email, phone, role, bio, experienceYears, skills } = payload;
@@ -48,25 +48,78 @@ const updateMyProfile = async (userId: string, payload: any) => {
   return updateUser;
 };
 
-// get technician profiles :
-const getTechnicianProfiles = async () => {
-  const technicianProfiles = await prisma.technicianProfile.findMany({
-    include: {
-      user: {
-        select: {
-          name: true,
-          email: true,
-          phone: true,
-          role: true,
-          status: true,
-        },
+// get technician profiles with filter :
+
+const getAllTechnicians = async (filters: GetTechniciansFilters) => {
+  const {
+    search,
+    skill,
+    minExperience,
+    minRating,
+    verified,
+    sortBy = "newest",
+    sortOrder = "desc",
+    page = "1",
+    limit = "10",
+  } = filters;
+
+  const pageNum = Math.max(Number(page) || 1, 1);
+  const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50);
+  const skip = (pageNum - 1) * limitNum;
+
+  const where: any = {};
+
+  if (search) {
+    where.user = { name: { contains: search, mode: "insensitive" } };
+  }
+
+  if (skill) {
+    where.skills = { has: skill };
+  }
+
+  if (minExperience) {
+    where.experienceYears = { gte: Number(minExperience) };
+  }
+
+  if (minRating) {
+    where.avgRating = { gte: Number(minRating) };
+  }
+
+  if (verified !== undefined) {
+    where.verified = verified === "true";
+  }
+
+  const orderBy: any =
+    sortBy === "rating"
+      ? { avgRating: sortOrder }
+      : sortBy === "experience"
+      ? { experienceYears: sortOrder }
+      : { createdAt: sortOrder };
+
+  const [technicians, total] = await prisma.$transaction([
+    prisma.technicianProfile.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limitNum,
+      include: {
+        user: { select: { id: true, name: true, phone: true } },
+        services: { include: { category: true } },
       },
+    }),
+    prisma.technicianProfile.count({ where }),
+  ]);
+
+  return {
+    meta: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
     },
-  });
-
-  return technicianProfiles;
+    data: technicians,
+  };
 };
-
 // get my bookings :
 const getMyBookings = async (userId: string, role: Role) => {
   if (role === "CUSTOMER") {
@@ -206,7 +259,7 @@ const getAllServices = async (filters: GetServicesFilters) => {
 
 export const userService = {
   updateMyProfile,
-  getTechnicianProfiles,
+  getAllTechnicians,
   getMyBookings,
   getBookingDetails,
   getAllServices

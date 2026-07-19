@@ -1,0 +1,19 @@
+filter service fields: 
+
+GET /api/users /services
+GET /api/users /services?categoryId=cat_uuid_plumbing
+GET /api/users /services?search=leak
+GET /api/users /services?minPrice=500&maxPrice=2000
+GET /api/users /services?minRating=4
+GET /api/users /services?sortBy=price&sortOrder=asc
+GET /api/users /services?categoryId=cat_uuid_plumbing&minRating=4&sortBy=rating&sortOrder=desc&page=1&limit=5
+
+
+filter technician fields: 
+GET /api/users/ technicians
+GET /api/users/ technicians?search=rafiq
+GET /api/users/ technicians?skill=plumbing
+GET /api/users/ technicians?minExperience=3
+GET /api/users/ technicians?minRating=4
+GET /api/users/ technicians?verified=true
+GET /api/users/ technicians?sortBy=rating&sortOrder=desc&page=1&limit=5
