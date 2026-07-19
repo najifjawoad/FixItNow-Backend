@@ -44,7 +44,21 @@ const createAvailability = catchAsync(
   },
 );
 
+// get all categories : 
+const getAllCategories = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await technicianServices.getAllCategories();
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: `All categories fetched successfully`,
+      data: result,
+    });
+  },
+);
+
 export const technicianController = {
   createServices,
   createAvailability,
+  getAllCategories
 };

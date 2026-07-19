@@ -10,5 +10,8 @@ router.post("/services" ,auth(Role.TECHNICIAN) ,technicianController.createServi
 
 router.post("/availability", auth(Role.TECHNICIAN), technicianController.createAvailability)
 
+// Get all categories :
+router.get("/allCategories" , auth(Role.ADMIN , Role.TECHNICIAN)  , technicianController.getAllCategories);
+
 
 export const technicianRoutes = router;

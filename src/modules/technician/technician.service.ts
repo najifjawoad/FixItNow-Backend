@@ -80,7 +80,13 @@ const createAvailability  = async(userId : string , payload : AddAvailabilityPay
 
 
 }
+
+// get all categories :
+const getAllCategories = async () => {
+  return await prisma.category.findMany();
+};
 export const technicianServices = {
   createServices,
-  createAvailability
+  createAvailability,
+  getAllCategories
 };
