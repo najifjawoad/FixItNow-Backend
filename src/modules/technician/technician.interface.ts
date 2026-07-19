@@ -13,3 +13,4 @@ export interface AddAvailabilityPayload {
   startTime: string; 
   endTime: string;   
 };
+

@@ -13,5 +13,8 @@ router.post("/availability", auth(Role.TECHNICIAN), technicianController.createA
 // Get all categories :
 router.get("/allCategories" , auth(Role.ADMIN , Role.TECHNICIAN)  , technicianController.getAllCategories);
 
+// update availability :
+router.patch("/update-availability" , auth(Role.TECHNICIAN) , technicianController.updateAvailability)
+
 
 export const technicianRoutes = router;

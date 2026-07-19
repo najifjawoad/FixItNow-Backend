@@ -57,8 +57,28 @@ const getAllCategories = catchAsync(
   },
 );
 
+// update availability :
+const updateAvailability = catchAsync(  async (req: Request, res: Response, next: NextFunction) =>
+{
+  const userId = req.user?.id;
+  const payload = req.body;
+  
+  const result = await technicianServices.updateAvailability(userId as string, payload);
+
+      sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Availability updated successfully",
+      data: result,
+    });
+
+
+
+})
+
 export const technicianController = {
   createServices,
   createAvailability,
-  getAllCategories
+  getAllCategories,
+  updateAvailability
 };
