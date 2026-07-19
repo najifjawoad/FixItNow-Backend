@@ -44,7 +44,7 @@ const createAvailability = catchAsync(
   },
 );
 
-// get all categories : 
+// get all categories :
 const getAllCategories = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await technicianServices.getAllCategories();
@@ -58,27 +58,53 @@ const getAllCategories = catchAsync(
 );
 
 // update availability :
-const updateAvailability = catchAsync(  async (req: Request, res: Response, next: NextFunction) =>
-{
-  const userId = req.user?.id;
-  const payload = req.body;
-  
-  const result = await technicianServices.updateAvailability(userId as string, payload);
+const updateAvailability = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const payload = req.body;
 
-      sendResponse(res, {
+    const result = await technicianServices.updateAvailability(
+      userId as string,
+      payload,
+    );
+
+    sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Availability updated successfully",
       data: result,
     });
+  },
+);
 
+// update user's booking status :
+const updateUsersBookingStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    // const { status } = req.body;
+    const { bookingId } = req.params;
 
+   
 
-})
+    const result = await technicianServices.updateBookingStatus(
+      userId as string,
+      bookingId as string,
+      req.body,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User's booking status updated successfully",
+      data: result,
+    });
+  },
+);
 
 export const technicianController = {
   createServices,
   createAvailability,
   getAllCategories,
-  updateAvailability
+  updateAvailability,
+  updateUsersBookingStatus,
 };

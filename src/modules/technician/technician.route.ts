@@ -5,9 +5,10 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-
+// create services :
 router.post("/services" ,auth(Role.TECHNICIAN) ,technicianController.createServices );
 
+// create availability
 router.post("/availability", auth(Role.TECHNICIAN), technicianController.createAvailability)
 
 // Get all categories :
@@ -16,5 +17,10 @@ router.get("/allCategories" , auth(Role.ADMIN , Role.TECHNICIAN)  , technicianCo
 // update availability :
 router.patch("/update-availability" , auth(Role.TECHNICIAN) , technicianController.updateAvailability)
 
-
+// update users booking status :
+router.patch(
+  "/bookings/:bookingId/status",
+  auth(Role.TECHNICIAN),
+  technicianController.updateUsersBookingStatus
+);
 export const technicianRoutes = router;

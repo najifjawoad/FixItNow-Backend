@@ -32,7 +32,7 @@ export const auth = (...requiredRoles: Role[]) => {
       throw new Error("Please log in first");
     }
   
-console.log("Extracted Token:", token);
+
 
     const verifiedToken = jwtUtils.verifyToken(token, config.jwt_access_secret);
 

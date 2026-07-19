@@ -1,4 +1,4 @@
-import { DayOfWeek } from "../../../generated/prisma/enums";
+import { BookingStatus, DayOfWeek } from "../../../generated/prisma/enums";
 
 export interface CreateServicePayload {
   categoryId: string;
@@ -13,4 +13,12 @@ export interface AddAvailabilityPayload {
   startTime: string; 
   endTime: string;   
 };
-
+export interface UpdateAvailabilityPayload {
+  availabilityId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+export interface UpdateBookingStatusPayload {
+  status: BookingStatus;
+}
