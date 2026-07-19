@@ -55,8 +55,6 @@ const logInUser = catchAsync(
 // Get my profile controller
 const getMyProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    
-   
     const profile = await authService.getMyProfile(
       req.user?.id as string,
       req.user?.role as string,
@@ -70,8 +68,32 @@ const getMyProfile = catchAsync(
     });
   },
 );
+
+// refresh token :
+const refreshToken = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    const { accessToken } = await authService.refreshToken(refreshToken);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24, //24 hour or ek din
+    });
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Token refreshed successfully",
+      data: { accessToken },
+    });
+  },
+);
 export const authController = {
   registerUser,
   logInUser,
   getMyProfile,
+  refreshToken,
 };
