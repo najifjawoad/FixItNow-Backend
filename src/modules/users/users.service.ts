@@ -1,3 +1,4 @@
+import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
 // Update my Profile :
@@ -63,7 +64,67 @@ const getTechnicianProfiles = async () => {
   return technicianProfiles;
 };
 
+// get my bookings :
+const getMyBookings = async (
+  userId: string,
+  role: Role,
+) => {
+  if (role === "CUSTOMER") {
+    const customersBookings = await prisma.booking.findMany({
+      where: { customerId: userId },
+      include: {
+        service: true,
+        technician: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { scheduledAt: "desc" },
+    });
+    return customersBookings;
+  }
+
+  if (role === "TECHNICIAN") {
+    const technicianProfile = await prisma.technicianProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!technicianProfile) {
+      throw new Error("Technician profile not found");
+    }
+
+    const techniciansBookings = await prisma.booking.findMany({
+      where : {technicianId : technicianProfile.id},
+      include : {service :true ,
+        customer : {
+          select :{
+            id : true,
+            name : true,
+            phone : true
+          }
+        }
+
+      } ,
+      orderBy : {scheduledAt :"desc"}
+    })
+    return techniciansBookings;
+  }
+  
+  throw new Error("Invalid role for this action");
+
+
+};
+
 export const userService = {
   updateMyProfile,
   getTechnicianProfiles,
+ getMyBookings 
+
 };

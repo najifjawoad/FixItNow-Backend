@@ -3,6 +3,8 @@ import { catchAsync } from "../../utils/catchAsync";
 import { userService } from "./users.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus  from "http-status";
+import { bookingsService } from "../bookings/bookings.service";
+import { Role } from "../../../generated/prisma/enums";
 
 
 // Update my Profile :
@@ -24,7 +26,6 @@ const updateMyProfile = catchAsync(async(req : Request , res: Response , next: N
 })
 
 // get technicians profiles:
-
 const getTechnicianProfiles = catchAsync(async(req : Request , res: Response , next: NextFunction)=>{
 
     const result = await userService.getTechnicianProfiles();
@@ -38,8 +39,26 @@ const getTechnicianProfiles = catchAsync(async(req : Request , res: Response , n
 
 })
 
+// get my bookings :
+
+const getMyBookings = catchAsync(async(req : Request , res: Response , next: NextFunction)=>{
+  const userId = req.user?.id ;
+  const role = req.user?.role; 
+
+
+    const result = await userService.getMyBookings(userId as string, role as Role ) ;
+
+    sendResponse(res,{
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Bookings retrieved successfully",
+    data: result,
+  } )
+
+})
 
 export const userController = {
     updateMyProfile,
-    getTechnicianProfiles
+    getTechnicianProfiles,
+    getMyBookings
 }
