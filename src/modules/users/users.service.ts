@@ -266,7 +266,7 @@ const getTechnicianById = async (id: string) => {
       user: { select: { id: true, name: true, phone: true } },
       services: { include: { category: true } },
       availability: {
-        where: { isBooked: false }, // only show open slots publicly
+        where: { isBooked: false }, 
         orderBy: { date: "asc" },
       },
       reviews: {

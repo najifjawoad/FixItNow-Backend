@@ -31,7 +31,7 @@ const createBooking = async (customerId: string, payload: CreateBookingPayload) 
       throw new Error("This slot is already booked");
     }
 
-    // Derive scheduledAt from the slot's date + startTime instead of trusting client input
+   
     const datePart = slot.date.toISOString().split("T")[0];
     const scheduledAt = new Date(`${datePart}T${slot.startTime}:00.000Z`);
 
@@ -56,7 +56,7 @@ const createBooking = async (customerId: string, payload: CreateBookingPayload) 
       },
     });
 
-    // Lock the slot immediately so no other customer can request it
+
     await tx.availability.update({
       where: { id: slot.id },
       data: { isBooked: true },
