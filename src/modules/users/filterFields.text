@@ -11,7 +11,7 @@ GET /api/users /services?categoryId=cat_uuid_plumbing&minRating=4&sortBy=rating&
 
 filter technician fields: 
 GET /api/users/ technicians
-GET /api/users/ technicians?search=rafiq
+GET /api/users/ technicians?search=technician1
 GET /api/users/ technicians?skill=plumbing
 GET /api/users/ technicians?minExperience=3
 GET /api/users/ technicians?minRating=4

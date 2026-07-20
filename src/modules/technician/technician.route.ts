@@ -19,7 +19,7 @@ router.patch("/update-availability" , auth(Role.TECHNICIAN) , technicianControll
 
 // update users booking status :
 router.patch(
-  "/bookings/:bookingId/status",
+  "/bookings/status/:bookingId",
   auth(Role.TECHNICIAN),
   technicianController.updateUsersBookingStatus
 );
