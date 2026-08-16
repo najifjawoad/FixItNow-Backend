@@ -21,6 +21,13 @@ router.patch("/update-availability" , auth(Role.TECHNICIAN) , technicianControll
 router.patch(
   "/bookings/status/:bookingId",
   auth(Role.TECHNICIAN),
-  technicianController.updateUsersBookingStatus
-);
+// get my services:
+router.get("/my-services", auth(Role.TECHNICIAN), technicianController.getMyServices);
+
+// update service:
+router.patch("/services/:id", auth(Role.TECHNICIAN), technicianController.updateService);
+
+// delete service:
+router.delete("/services/:id", auth(Role.TECHNICIAN), technicianController.deleteService);
+
 export const technicianRoutes = router;

@@ -272,10 +272,96 @@ const updateBookingStatus = async (
   });
 };
 
+// get my services:
+const getMyServices = async (userId: string) => {
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new Error("Technician profile not found");
+  }
+
+  return prisma.service.findMany({
+    where: { technicianId: technicianProfile.id },
+    include: { category: true },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+// update service:
+const updateService = async (
+  userId: string,
+  serviceId: string,
+  payload: Partial<CreateServicePayload>,
+) => {
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new Error("Technician profile not found");
+  }
+
+  const service = await prisma.service.findUnique({
+    where: { id: serviceId },
+  });
+
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.technicianId !== technicianProfile.id) {
+    throw new Error("Unauthorized to update this service");
+  }
+
+  return prisma.service.update({
+    where: { id: serviceId },
+    data: {
+      ...(payload.title && { title: payload.title }),
+      ...(payload.description !== undefined && { description: payload.description }),
+      ...(payload.price && { price: payload.price }),
+      ...(payload.durationMinutes && { durationMinutes: payload.durationMinutes }),
+      ...(payload.categoryId && { categoryId: payload.categoryId }),
+    },
+    include: { category: true },
+  });
+};
+
+// delete service:
+const deleteService = async (userId: string, serviceId: string) => {
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new Error("Technician profile not found");
+  }
+
+  const service = await prisma.service.findUnique({
+    where: { id: serviceId },
+  });
+
+  if (!service) {
+    throw new Error("Service not found");
+  }
+
+  if (service.technicianId !== technicianProfile.id) {
+    throw new Error("Unauthorized to delete this service");
+  }
+
+  return prisma.service.delete({
+    where: { id: serviceId },
+  });
+};
+
 export const technicianServices = {
   createServices,
   createAvailability,
   getAllCategories,
   updateAvailability,
   updateBookingStatus,
+  getMyServices,
+  updateService,
+  deleteService,
 };

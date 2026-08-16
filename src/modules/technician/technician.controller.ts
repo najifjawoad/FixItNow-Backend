@@ -101,10 +101,64 @@ const updateUsersBookingStatus = catchAsync(
   },
 );
 
+// get my services:
+const getMyServices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const result = await technicianServices.getMyServices(userId as string);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My services retrieved successfully",
+      data: result,
+    });
+  },
+);
+
+// update service:
+const updateService = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const result = await technicianServices.updateService(
+      userId as string,
+      id as string,
+      req.body,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Service updated successfully",
+      data: result,
+    });
+  },
+);
+
+// delete service:
+const deleteService = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const result = await technicianServices.deleteService(
+      userId as string,
+      id as string,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Service deleted successfully",
+      data: result,
+    });
+  },
+);
+
 export const technicianController = {
   createServices,
   createAvailability,
   getAllCategories,
   updateAvailability,
   updateUsersBookingStatus,
+  getMyServices,
+  updateService,
+  deleteService,
 };
