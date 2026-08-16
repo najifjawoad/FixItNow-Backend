@@ -9,7 +9,11 @@ import { bookingsController } from "./bookings.controller";
 const router = express.Router();
 
 router.post(
-  "/",auth(Role.CUSTOMER),bookingsController.createBooking,
+  "/", auth(Role.CUSTOMER), bookingsController.createBooking,
+);
+
+router.patch(
+  "/:id/cancel", auth(Role.CUSTOMER), bookingsController.cancelBooking,
 );
 
 export const BookingRoutes = router;
