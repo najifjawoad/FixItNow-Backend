@@ -3,9 +3,9 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./lib/prisma";
 
 async function main() {
-  console.log("Seeding FixItNow database...");
+  console.log("Seeding FixItNow database with Bangladeshi Demo Data...");
 
-  // 1. Create Admin User
+  // 1. Admin User
   const adminPassword = await bcrypt.hash("12345", 10);
   const admin = await prisma.user.upsert({
     where: { email: "admin123@gmail.com" },
@@ -14,39 +14,39 @@ async function main() {
       name: "Platform Admin",
       email: "admin123@gmail.com",
       password: adminPassword,
-      phone: "+1 800-555-0100",
+      phone: "+880 1700-000000",
       role: "ADMIN",
       status: "ACTIVE",
     },
   });
   console.log("Admin created:", admin.email);
 
-  // 2. Create Customer User
+  // 2. Customer User
   const customerPassword = await bcrypt.hash("password123", 10);
   const customer = await prisma.user.upsert({
     where: { email: "customer@fixitnow.com" },
     update: {},
     create: {
-      name: "John Customer",
+      name: "Tariqul Islam",
       email: "customer@fixitnow.com",
       password: customerPassword,
-      phone: "+1 555-0199",
+      phone: "+880 1711-998877",
       role: "CUSTOMER",
       status: "ACTIVE",
     },
   });
   console.log("Customer created:", customer.email);
 
-  // 3. Create Technician 1 User & Profile
+  // 3. Technician 1: Engr. Tanvir Ahmed (Electrical)
   const techPassword = await bcrypt.hash("password123", 10);
   const techUser1 = await prisma.user.upsert({
-    where: { email: "tech@fixitnow.com" },
+    where: { email: "tanvir.electric@gmail.com" },
     update: {},
     create: {
-      name: "Alexander Wright",
-      email: "tech@fixitnow.com",
+      name: "Engr. Tanvir Ahmed",
+      email: "tanvir.electric@gmail.com",
       password: techPassword,
-      phone: "+1 555-0288",
+      phone: "+880 1712-345678",
       role: "TECHNICIAN",
       status: "ACTIVE",
     },
@@ -57,24 +57,23 @@ async function main() {
     update: {},
     create: {
       userId: techUser1.id,
-      bio: "Licensed Master Electrician & HVAC Specialist with over 8 years of residential and commercial service experience.",
-      experienceYears: 8,
-      skills: ["Electrical", "HVAC", "Wiring", "Circuit Repair", "Panel Upgrade"],
+      bio: "Certified Electrical Engineer with 9 years of experience in Dhaka. Specialist in DB box installation, home rewiring, IPS/UPS setup, and emergency short-circuit repair.",
+      experienceYears: 9,
+      skills: ["Electrical", "IPS & Generator", "Circuit Repair", "DB Box Setup", "Substation"],
       avgRating: 4.9,
       verified: true,
     },
   });
-  console.log("Technician 1 created:", techUser1.email);
 
-  // 4. Create Technician 2 User & Profile
+  // 4. Technician 2: Md. Rafiqul Islam (Plumbing)
   const techUser2 = await prisma.user.upsert({
-    where: { email: "tech2@fixitnow.com" },
+    where: { email: "rafiq.plumbing@gmail.com" },
     update: {},
     create: {
-      name: "Sarah Jenkins",
-      email: "tech2@fixitnow.com",
+      name: "Md. Rafiqul Islam",
+      email: "rafiq.plumbing@gmail.com",
       password: techPassword,
-      phone: "+1 555-0377",
+      phone: "+880 1819-876543",
       role: "TECHNICIAN",
       status: "ACTIVE",
     },
@@ -85,22 +84,77 @@ async function main() {
     update: {},
     create: {
       userId: techUser2.id,
-      bio: "Expert Plumbing & Piping Specialist specializing in emergency leak repair, drain clearing, and fixture installation.",
-      experienceYears: 6,
-      skills: ["Plumbing", "Pipe Repair", "Drain Clearing", "Fixture Install", "Water Heater"],
+      bio: "Professional plumber serving Gulshan, Banani, and Dhanmondi areas. Expert in sanitary fitting, water pump repair, pipeline leak fixing, and gas line inspection.",
+      experienceYears: 7,
+      skills: ["Plumbing", "Sanitary Fitting", "Water Pump", "Pipe Leak Repair", "Gas Line"],
       avgRating: 4.8,
       verified: true,
     },
   });
-  console.log("Technician 2 created:", techUser2.email);
 
-  // 5. Create Categories
+  // 5. Technician 3: Kazi Mahmud Hasan (HVAC / AC)
+  const techUser3 = await prisma.user.upsert({
+    where: { email: "mahmud.acservice@gmail.com" },
+    update: {},
+    create: {
+      name: "Kazi Mahmud Hasan",
+      email: "mahmud.acservice@gmail.com",
+      password: techPassword,
+      phone: "+880 1911-234567",
+      role: "TECHNICIAN",
+      status: "ACTIVE",
+    },
+  });
+
+  const techProfile3 = await prisma.technicianProfile.upsert({
+    where: { userId: techUser3.id },
+    update: {},
+    create: {
+      userId: techUser3.id,
+      bio: "Certified Inverter AC technician with 8 years of experience. Specialist in jet wash master service, gas refill (R32/R410a), compressor repair, and split AC installation.",
+      experienceYears: 8,
+      skills: ["HVAC", "AC Master Wash", "Gas Refill", "Compressor Repair", "Inverter AC"],
+      avgRating: 4.9,
+      verified: true,
+    },
+  });
+
+  // 6. Technician 4: Naimur Rahman (Carpentry)
+  const techUser4 = await prisma.user.upsert({
+    where: { email: "naimur.carpenter@gmail.com" },
+    update: {},
+    create: {
+      name: "Naimur Rahman",
+      email: "naimur.carpenter@gmail.com",
+      password: techPassword,
+      phone: "+880 1615-998877",
+      role: "TECHNICIAN",
+      status: "ACTIVE",
+    },
+  });
+
+  const techProfile4 = await prisma.technicianProfile.upsert({
+    where: { userId: techUser4.id },
+    update: {},
+    create: {
+      userId: techUser4.id,
+      bio: "Skilled artisan with 10 years of experience in custom door fitting, modular kitchen cabinet crafting, furniture repair, and door lock installation.",
+      experienceYears: 10,
+      skills: ["Carpentry", "Kitchen Cabinet", "Door Lock Repair", "Furniture Polish", "Woodwork"],
+      avgRating: 5.0,
+      verified: true,
+    },
+  });
+
+  console.log("Technicians created.");
+
+  // 7. Categories
   const catElectrical = await prisma.category.upsert({
     where: { name: "Electrical Services" },
     update: {},
     create: {
       name: "Electrical Services",
-      description: "Wiring, circuit breaker repair, lighting installation, and safety inspections.",
+      description: "Wiring, circuit breaker repair, DB box installation, and safety grounding inspections.",
     },
   });
 
@@ -109,7 +163,7 @@ async function main() {
     update: {},
     create: {
       name: "Plumbing & Piping",
-      description: "Leak repair, drain unblocking, faucet installation, and pipe maintenance.",
+      description: "Water pump repair, concealed leak sealing, sanitary fittings, and gas line inspection.",
     },
   });
 
@@ -118,79 +172,94 @@ async function main() {
     update: {},
     create: {
       name: "HVAC & AC Service",
-      description: "Air conditioner repair, duct cleaning, heating system maintenance.",
+      description: "Split & Inverter AC jet wash, refrigerant gas refill, and compressor repair.",
     },
   });
 
   const catCarpentry = await prisma.category.upsert({
-    where: { name: "Carpentry & Repairs" },
+    where: { name: "Carpentry & Handyman" },
     update: {},
     create: {
-      name: "Carpentry & Repairs",
-      description: "Furniture assembly, door lock repair, shelving, and handyman fixes.",
+      name: "Carpentry & Handyman",
+      description: "Modular kitchen cabinet crafting, door lock fitting, and custom woodwork polish.",
     },
   });
+
   console.log("Categories created.");
 
-  // 6. Create Services
-  const srv1 = await prisma.service.create({
-    data: {
-      technicianId: techProfile1.id,
-      categoryId: catElectrical.id,
-      title: "Electrical Circuit Breaker & Panel Upgrade",
-      description: "Full diagnostic of electrical panel, breaker replacement, and safety grounding certification.",
-      price: 120.0,
-      durationMinutes: 90,
-    },
-  });
-
-  const srv2 = await prisma.service.create({
-    data: {
-      technicianId: techProfile1.id,
-      categoryId: catElectrical.id,
-      title: "Emergency Wiring & Outlet Repair",
-      description: "Troubleshooting short circuits, repairing sparky wall outlets, and fixture re-wiring.",
-      price: 85.0,
-      durationMinutes: 60,
-    },
-  });
-
-  const srv3 = await prisma.service.create({
-    data: {
-      technicianId: techProfile1.id,
-      categoryId: catHvac.id,
-      title: "AC Unit Deep Cleaning & Coolant Inspection",
-      description: "Filter replacement, coil washing, refrigerant level check, and thermostat calibration.",
-      price: 95.0,
-      durationMinutes: 75,
-    },
-  });
-
-  const srv4 = await prisma.service.create({
-    data: {
-      technicianId: techProfile2.id,
-      categoryId: catPlumbing.id,
-      title: "Emergency Pipe Leak Repair & Sealing",
-      description: "Immediate response for bursting pipes, high-pressure sealing, and joint replacement.",
-      price: 110.0,
-      durationMinutes: 60,
-    },
-  });
-
-  const srv5 = await prisma.service.create({
-    data: {
-      technicianId: techProfile2.id,
-      categoryId: catPlumbing.id,
-      title: "Kitchen Faucet & Drain Unblocking",
-      description: "Clogged sink restoration, faucet replacement, garbage disposal maintenance.",
-      price: 75.0,
-      durationMinutes: 45,
-    },
+  // 8. Services
+  await prisma.service.createMany({
+    data: [
+      {
+        technicianId: techProfile1.id,
+        categoryId: catElectrical.id,
+        title: "DB Box Installation & Full House Rewiring",
+        description: "Full diagnostic of distribution box, breaker replacement, and safety grounding certification.",
+        price: 35.0,
+        durationMinutes: 120,
+      },
+      {
+        technicianId: techProfile1.id,
+        categoryId: catElectrical.id,
+        title: "IPS & Generator Line Connection & Servicing",
+        description: "Instant Power Supply (IPS) wiring, battery fluid check, and automatic changeover switch setup.",
+        price: 25.0,
+        durationMinutes: 90,
+      },
+      {
+        technicianId: techProfile1.id,
+        categoryId: catElectrical.id,
+        title: "Emergency Short-Circuit Repair & Load Balancing",
+        description: "Troubleshooting short circuits, repairing sparky wall sockets, and main line load balancing.",
+        price: 18.0,
+        durationMinutes: 60,
+      },
+      {
+        technicianId: techProfile2.id,
+        categoryId: catPlumbing.id,
+        title: "Water Submersible Pump Repair & Pipeline Unblocking",
+        description: "Roof tank motor repair, line pressure adjustment, and main underground pipe unblocking.",
+        price: 30.0,
+        durationMinutes: 90,
+      },
+      {
+        technicianId: techProfile2.id,
+        categoryId: catPlumbing.id,
+        title: "Sanitary Fitting & Concealed Pipe Leak Sealing",
+        description: "Bathroom commode, basin, concealed shower mixer installation, and high-pressure leak sealing.",
+        price: 22.0,
+        durationMinutes: 75,
+      },
+      {
+        technicianId: techProfile3.id,
+        categoryId: catHvac.id,
+        title: "Inverter AC Master Jet Wash & Filter Cleaning",
+        description: "High-pressure chemical wash of indoor & outdoor units, drain pipe clearing, and airflow optimization.",
+        price: 20.0,
+        durationMinutes: 60,
+      },
+      {
+        technicianId: techProfile3.id,
+        categoryId: catHvac.id,
+        title: "AC Gas Refill (R32 / R410a) & Copper Pipe Repair",
+        description: "Refrigerant pressure check, flare nut leak sealing, copper pipe insulation, and gas top-up.",
+        price: 45.0,
+        durationMinutes: 60,
+      },
+      {
+        technicianId: techProfile4.id,
+        categoryId: catCarpentry.id,
+        title: "Modular Kitchen Cabinet Repair & Lock Fitting",
+        description: "Soft-close hinge adjustment, hydraulic stay lift installation, and security lock replacement.",
+        price: 20.0,
+        durationMinutes: 60,
+      },
+    ],
   });
 
   console.log("Services created.");
 
-  // 7. Create Availability Slots
+  // 9. Availability Slots
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
@@ -199,24 +268,20 @@ async function main() {
   dayAfter.setDate(dayAfter.getDate() + 2);
   dayAfter.setHours(0, 0, 0, 0);
 
-  const nextWeek = new Date();
-  nextWeek.setDate(nextWeek.getDate() + 3);
-  nextWeek.setHours(0, 0, 0, 0);
-
   await prisma.availability.createMany({
     data: [
       { technicianId: techProfile1.id, date: tomorrow, startTime: "09:00", endTime: "12:00" },
-      { technicianId: techProfile1.id, date: tomorrow, startTime: "13:00", endTime: "16:00" },
-      { technicianId: techProfile1.id, date: dayAfter, startTime: "10:00", endTime: "13:00" },
-      { technicianId: techProfile1.id, date: nextWeek, startTime: "14:00", endTime: "17:00" },
+      { technicianId: techProfile1.id, date: tomorrow, startTime: "14:00", endTime: "17:00" },
       { technicianId: techProfile2.id, date: tomorrow, startTime: "08:30", endTime: "11:30" },
-      { technicianId: techProfile2.id, date: tomorrow, startTime: "14:00", endTime: "17:00" },
-      { technicianId: techProfile2.id, date: dayAfter, startTime: "09:00", endTime: "12:00" },
+      { technicianId: techProfile2.id, date: dayAfter, startTime: "10:00", endTime: "13:00" },
+      { technicianId: techProfile3.id, date: tomorrow, startTime: "10:00", endTime: "13:00" },
+      { technicianId: techProfile3.id, date: dayAfter, startTime: "15:00", endTime: "18:00" },
+      { technicianId: techProfile4.id, date: tomorrow, startTime: "11:00", endTime: "14:00" },
     ],
   });
 
   console.log("Availability slots created.");
-  console.log("Database successfully seeded!");
+  console.log("Database successfully seeded with Bangladeshi demographic data!");
 }
 
 main()
