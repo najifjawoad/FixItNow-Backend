@@ -14,8 +14,8 @@ router.patch("/updateUserStatus/:id",auth(Role.ADMIN) ,adminController.updateUse
 // Create new service category :
 router.post("/categories" , auth(Role.ADMIN), adminController.createCategories);
 
-// Get all categories :
-router.get("/allCategories" , auth(Role.ADMIN)  , adminController.getAllCategories);
+// Get all categories (Public for marketplace browsing):
+router.get("/allCategories", adminController.getAllCategories);
 
 // Get all bookings : 
 router.get("/allBookings" , auth(Role.ADMIN)  ,adminController.getAllBookings );
