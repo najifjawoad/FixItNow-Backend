@@ -20,7 +20,10 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: config.app_url,
+    origin: (origin, callback) => {
+      // Allow any origin during development so frontend on port 3001, 3000 or custom ports work seamlessly
+      callback(null, true);
+    },
     credentials: true,
   }),
 );

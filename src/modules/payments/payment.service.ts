@@ -43,6 +43,8 @@ if (booking.status !== "ACCEPTED") {
 
   const amountInCents = Math.round(Number(booking.service.price) * 100);
 
+  const baseUrl = (config.app_url || "http://localhost:3001").replace(/\/+$/, "");
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
@@ -57,8 +59,8 @@ if (booking.status !== "ACCEPTED") {
       },
     ],
     metadata: { bookingId: booking.id, customerId },
-    success_url: `${config.app_url}/payment-success?bookingId=${booking.id}`,
-    cancel_url: `${config.app_url}/payment-cancelled?bookingId=${booking.id}`,
+    success_url: `${baseUrl}/payment/success?bookingId=${booking.id}`,
+    cancel_url: `${baseUrl}/payment/cancel?bookingId=${booking.id}`,
   });
 
 
