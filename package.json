@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "tsx watch ./src/server.ts",
-    "build": "tsup",
+    "build": "prisma generate && tsup",
+    "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

@@ -139,6 +139,7 @@ const getMyBookings = async (userId: string, role: Role) => {
             },
           },
         },
+        review: true,
       },
       orderBy: { scheduledAt: "desc" },
     });
@@ -250,6 +251,7 @@ const getAllServices = async (filters: GetServicesFilters) => {
         technician: {
           include: {
             user: { select: { id: true, name: true } },
+            reviews: true,
           },
         },
       },
