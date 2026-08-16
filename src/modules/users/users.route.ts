@@ -14,9 +14,11 @@ router.get("/get-my-bookings" , auth(Role.CUSTOMER, Role.TECHNICIAN), userContro
 
 router.get("/get-booking-details/:id" , auth(Role.CUSTOMER, Role.TECHNICIAN) , userController.getBookingDetails)
 
-router.get("/services",auth(Role.ADMIN,Role.CUSTOMER) ,userController.getAllServices);
+// Services browsing (Public / All Roles):
+router.get("/services", userController.getAllServices);
 
-router.get("/technicians/:id", auth(Role.ADMIN,Role.CUSTOMER)  ,userController.getTechnicianById);
+// Technician profile detail (Public / All Roles):
+router.get("/technicians/:id", userController.getTechnicianById);
 
 
 router.post("/review", auth(Role.CUSTOMER), userController.createReview);

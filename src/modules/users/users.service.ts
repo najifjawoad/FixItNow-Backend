@@ -165,6 +165,16 @@ const getMyBookings = async (userId: string, role: Role) => {
             phone: true,
           },
         },
+        review: {
+          include: {
+            customer: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { scheduledAt: "desc" },
     });
