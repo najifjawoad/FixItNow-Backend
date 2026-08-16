@@ -143,11 +143,30 @@ const confirmPayment = async (event: Stripe.Event) => {
 //  Get user's payment history ---
 const getMyPayments = async (userId: string, role: "CUSTOMER" | "TECHNICIAN") => {
   if (role === "CUSTOMER") {
-    return prisma.payment.findMany({
+    const payments = await prisma.payment.findMany({
       where: { booking: { customerId: userId } },
       include: { booking: { include: { service: true } } },
       orderBy: { createdAt: "desc" },
     });
+
+    for (const p of payments) {
+      if (p.booking && p.booking.status === "ACCEPTED") {
+        await prisma.$transaction([
+          prisma.payment.update({
+            where: { id: p.id },
+            data: { status: "COMPLETED", paidAt: new Date() },
+          }),
+          prisma.booking.update({
+            where: { id: p.bookingId },
+            data: { status: "PAID" },
+          }),
+        ]);
+        p.booking.status = "PAID";
+        p.status = "COMPLETED";
+      }
+    }
+
+    return payments;
   }
 
   const technicianProfile = await prisma.technicianProfile.findUnique({ where: { userId } });

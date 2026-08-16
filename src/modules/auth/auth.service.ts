@@ -48,40 +48,38 @@ const registerUserIntoDb = async (payload: RegisterUserPayload) => {
     Number(config.bcrypt_salt_rounds),
   );
 
-  const user = await prisma.$transaction(async (tx) => {
-    const newUser = await tx.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        phone,
-        role,
-      },
-    });
-
-    if (role === "TECHNICIAN") {
-      await tx.technicianProfile.create({
-        data: {
-          userId: newUser.id,
-          bio,
-          experienceYears,
-          skills,
-        },
-      });
-    }
-
-    return tx.user.findUnique({
-      where: {
-        id: newUser.id,
-      },
-      omit: {
-        password: true,
-      },
-      include: {
-        technicianProfile: true,
-      },
-    });
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role,
+      ...(role === "TECHNICIAN" && bio && experienceYears !== undefined && skills
+        ? {
+            technicianProfile: {
+              create: {
+                bio,
+                experienceYears,
+                skills,
+              },
+            },
+          }
+        : {}),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      technicianProfile: true,
+    },
   });
+
   return user;
 };
 
