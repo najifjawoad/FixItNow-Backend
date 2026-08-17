@@ -43,7 +43,7 @@ if (booking.status !== "ACCEPTED") {
 
   const amountInCents = Math.round(Number(booking.service.price) * 100);
 
-  const baseUrl = (config.app_url || "http://localhost:3001").replace(/\/+$/, "");
+  const baseUrl = (config.app_url || "https://fix-it-now-frontend-iota.vercel.app").replace(/\/+$/, "");
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",

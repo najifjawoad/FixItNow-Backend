@@ -46,6 +46,24 @@ const createServices = async (
   return service;
 };
 
+// Helper function to normalize time string to HH:mm (e.g. "9:00" -> "09:00")
+const normalizeTimeString = (timeStr: string): string => {
+  if (!timeStr) return timeStr;
+  const parts = timeStr.trim().split(":");
+  if (parts.length < 2 || !parts[0] || !parts[1]) return timeStr;
+  const hours = parts[0].padStart(2, "0");
+  const minutes = parts[1].padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+// Helper function to get YYYY-MM-DD string cleanly for date comparison
+const getYYYYMMDD = (d: Date): string => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 // create availability :
 const createAvailability = async (
   userId: string,
@@ -59,7 +77,10 @@ const createAvailability = async (
     throw new Error("Technician profile not found");
   }
 
-  if (payload.startTime >= payload.endTime) {
+  const startTime = normalizeTimeString(payload.startTime);
+  const endTime = normalizeTimeString(payload.endTime);
+
+  if (startTime >= endTime) {
     throw new Error("startTime must be before endTime");
   }
 
@@ -69,10 +90,10 @@ const createAvailability = async (
     throw new Error("Invalid date");
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const slotDateStr = getYYYYMMDD(slotDate);
+  const todayStr = getYYYYMMDD(new Date());
 
-  if (slotDate < today) {
+  if (slotDateStr < todayStr) {
     throw new Error("Cannot add availability for a past date");
   }
 
@@ -80,8 +101,8 @@ const createAvailability = async (
     where: {
       technicianId: technicianProfile.id,
       date: slotDate,
-      startTime: { lt: payload.endTime },
-      endTime: { gt: payload.startTime },
+      startTime: { lt: endTime },
+      endTime: { gt: startTime },
     },
   });
 
@@ -93,8 +114,8 @@ const createAvailability = async (
     data: {
       technicianId: technicianProfile.id,
       date: slotDate,
-      startTime: payload.startTime,
-      endTime: payload.endTime,
+      startTime,
+      endTime,
     },
   });
 
@@ -137,7 +158,10 @@ const updateAvailability = async (
     throw new Error("Booked slots cannot be updated");
   }
 
-  if (payload.startTime >= payload.endTime) {
+  const startTime = normalizeTimeString(payload.startTime);
+  const endTime = normalizeTimeString(payload.endTime);
+
+  if (startTime >= endTime) {
     throw new Error("startTime must be before endTime");
   }
 
@@ -147,10 +171,10 @@ const updateAvailability = async (
     throw new Error("Invalid date");
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const slotDateStr = getYYYYMMDD(slotDate);
+  const todayStr = getYYYYMMDD(new Date());
 
-  if (slotDate < today) {
+  if (slotDateStr < todayStr) {
     throw new Error("Cannot update availability for a past date");
   }
 
@@ -162,10 +186,10 @@ const updateAvailability = async (
       },
       date: slotDate,
       startTime: {
-        lt: payload.endTime,
+        lt: endTime,
       },
       endTime: {
-        gt: payload.startTime,
+        gt: startTime,
       },
     },
   });
@@ -180,9 +204,40 @@ const updateAvailability = async (
     },
     data: {
       date: slotDate,
-      startTime: payload.startTime,
-      endTime: payload.endTime,
+      startTime,
+      endTime,
     },
+  });
+};
+
+// delete availability slot :
+const deleteAvailability = async (userId: string, availabilityId: string) => {
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: { userId },
+  });
+
+  if (!technicianProfile) {
+    throw new Error("Technician profile not found");
+  }
+
+  const availability = await prisma.availability.findUnique({
+    where: { id: availabilityId },
+  });
+
+  if (!availability) {
+    throw new Error("Availability slot not found");
+  }
+
+  if (availability.technicianId !== technicianProfile.id) {
+    throw new Error("Unauthorized to delete this availability slot");
+  }
+
+  if (availability.isBooked) {
+    throw new Error("Booked availability slots cannot be deleted");
+  }
+
+  return prisma.availability.delete({
+    where: { id: availabilityId },
   });
 };
 
@@ -360,6 +415,7 @@ export const technicianServices = {
   createAvailability,
   getAllCategories,
   updateAvailability,
+  deleteAvailability,
   updateBookingStatus,
   getMyServices,
   updateService,

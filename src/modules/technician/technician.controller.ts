@@ -152,11 +152,30 @@ const deleteService = catchAsync(
   },
 );
 
+// delete availability slot:
+const deleteAvailability = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const { id } = req.params;
+    const result = await technicianServices.deleteAvailability(
+      userId as string,
+      id as string,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Availability slot deleted successfully",
+      data: result,
+    });
+  },
+);
+
 export const technicianController = {
   createServices,
   createAvailability,
   getAllCategories,
   updateAvailability,
+  deleteAvailability,
   updateUsersBookingStatus,
   getMyServices,
   updateService,

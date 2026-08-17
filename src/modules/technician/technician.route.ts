@@ -17,6 +17,9 @@ router.get("/allCategories", auth(Role.ADMIN, Role.TECHNICIAN), technicianContro
 // update availability :
 router.patch("/update-availability", auth(Role.TECHNICIAN), technicianController.updateAvailability);
 
+// delete availability slot :
+router.delete("/availability/:id", auth(Role.TECHNICIAN), technicianController.deleteAvailability);
+
 // update users booking status :
 router.patch(
   "/bookings/status/:bookingId",

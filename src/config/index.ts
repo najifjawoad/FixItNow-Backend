@@ -8,7 +8,7 @@ export default {
   port: process.env.PORT || 5000,
 
   database_url: process.env.DATABASE_URL,
-  app_url : process.env.APP_URL,
+  app_url: process.env.APP_URL || process.env.FRONTEND_URL || "https://fix-it-now-frontend-iota.vercel.app",
 
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
 
